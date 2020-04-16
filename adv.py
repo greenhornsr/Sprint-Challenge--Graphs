@@ -10,11 +10,11 @@ world = World()
 
 
 # You may uncomment the smaller graphs for development and testing purposes.
-# map_file = "maps/test_line.txt"
+map_file = "maps/test_line.txt"
 # map_file = "maps/test_cross.txt"
 # map_file = "maps/test_loop.txt"
 # map_file = "maps/test_loop_fork.txt"
-map_file = "maps/main_maze.txt"
+# map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
 room_graph=literal_eval(open(map_file, "r").read())
@@ -28,6 +28,29 @@ player = Player(world.starting_room)
 # Fill this out with directions to walk
 # traversal_path = ['n', 'n']
 traversal_path = []
+#*******************************MY CODE*******************************
+print('room graph: ')
+print(room_graph)
+
+print("\n")
+print(f"Starting Room Name: {player.current_room.name}\n")
+print(f"Starting Room ID: {player.current_room.id}\n")
+
+print("player current room exits: ")
+print(f"exits: {player.current_room.get_exits()}\n")
+
+print("travel direction: ")
+print(f"traveling: {player.current_room.get_exits()[0]}")
+player.travel(player.current_room.get_exits()[0])
+
+print(f"exits for room: {player.current_room.id}, {player.current_room.get_exits()}")
+print(f"traveling: {player.current_room.get_exits()[0]}")
+player.travel(player.current_room.get_exits()[0])
+
+print("exits: ", player.current_room.get_exits())
+
+
+#*****************************END MY CODE*****************************
 
 
 
@@ -51,12 +74,12 @@ else:
 #######
 # UNCOMMENT TO WALK AROUND
 #######
-player.current_room.print_room_description(player)
-while True:
-    cmds = input("-> ").lower().split(" ")
-    if cmds[0] in ["n", "s", "e", "w"]:
-        player.travel(cmds[0], True)
-    elif cmds[0] == "q":
-        break
-    else:
-        print("I did not understand that command.")
+# player.current_room.print_room_description(player)
+# while True:
+#     cmds = input("-> ").lower().split(" ")
+#     if cmds[0] in ["n", "s", "e", "w"]:
+#         player.travel(cmds[0], True)
+#     elif cmds[0] == "q":
+#         break
+#     else:
+#         print("I did not understand that command.")
