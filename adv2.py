@@ -76,52 +76,56 @@ ss.push([start_vert])
 
 # create a set of traversed vertices
 visited = set()
-prev_room = player.current_room.id
+
 # while queue is not empty:
 while ss.size() > 0:
     # dequeue/pop first vertex
     path = ss.pop() # <-- important to POP before anything else in the loop when using a stack or you can end up in an infinite loop.
-    print("path: ", path)
-
     # if path not in visited:
     if path[-1] not in visited:
         # add to visited
         visited.add(path[-1])
-        print(f"path: {path[-1]}")
+        # print(f"path: {path[-1]}")
 
         # ***** Do the thing *****
-        dir = player.current_room.get_exits()
-        exits = [exit for exit in dir if unvisited[path[-1]][exit] == "?"]
-        print("exits", exits)
-        print("vert", unvisited[path[-1]][dir[-1]])
+        # Get Directions
+        print("function exits: ", player.current_room.get_exits())
 
-        if exits and unvisited[path[-1]][exits[-1]] == "?":
-            print(f"current room: {player.current_room.id}, dir is {exits[-1]}")
-            print("vert", unvisited[path[-1]][exits[-1]])
-            print("path: ", path)
-            print("path: ", path[-1])
-            player.travel(exits[-1])
-            traversal_path.append(exits[-1])
-            print("path again: ", path)            
-            print("path again: ", path[-1])
-            unvisited[path[-1]][exits[-1]] = player.current_room.id
-            print(f"updated vert: {path[-1]}, dir: {exits[-1]} to be {unvisited[path[-1]][exits[-1]]}")
+        dir_options = [dir for dir in edges if edges[dir] == "?"]
+        print(f"\n**** vert: {start_vert}, \n    **** dir options: {dir_options}")
 
-            unvisited[player.current_room.id][invert[exits[-1]]] = prev_room
-            prev_room = player.current_room.id
-            # print(f"current room: ", player.current_room.id)
-            # print(f"unvisited again: ", unvisited)
+        # Helper Functions:
+        # direction manager
+        def direction_manager(start_vert):
+            random_dir = random.choice(dir_options)
+            print('    **** randomly chosen travel direction: ', random_dir.upper())
+            return random_dir
+
+        # if directions exist, get random direction, update current vert edge, travel, update next vert edge
+        if dir_options and len(dir_options) > 1:
+            dir = direction_manager(player.current_room.id)
+            next_vert = player.current_room.get_room_in_direction(dir).id
+            print(f"    **** next_vert: {next_vert}")
+            edges[dir] = next_vert
+            unvisited[next_vert][invert[dir]] = start_vert
+            player.travel(dir)
+            traversal_path.append(dir)
+            print(f"\nPath Traveled: {traversal_path}")
+            print(f"\n\nunvisited: {unvisited}")
+            start_vert = player.current_room.id
             # enqueue all neighbors
             for next_vert in unvisited[path[-1]]:
-                if unvisited[path[-1]][next_vert] != "?" and next_vert != invert[exits[-1]]:
-                    print("UNVISITED>>.: ", unvisited)
-                    print("next vert", next_vert)
-                    print("#EFWFE", unvisited[path[-1]][next_vert],"\n\n\n")
-                    new_path = list(path)
-                    new_path.append(unvisited[path[-1]][next_vert])
-                    ss.push(new_path)
+                print("next vert", next_vert)
+                print("#EFWFE", unvisited[path[-1]])
+                new_path = list(path)
+                new_path.append(player.current_room.id)
+                ss.push(new_path)
 
-
+        dir = player.current_room.get_exits()
+        print("dir", dir[-1].upper())
+        print("vert", unvisited[player.current_room.id][dir[-1]])
+        if unvisited[player.current_room.id][dir[-1]] == "?":
+            player.travel(dir)
 
 
 
