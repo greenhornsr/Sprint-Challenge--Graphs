@@ -2,6 +2,7 @@ from room import Room
 from player import Player
 from world import World
 
+import pdb
 import random
 from ast import literal_eval
 
@@ -10,10 +11,10 @@ world = World()
 
 
 # You may uncomment the smaller graphs for development and testing purposes.
-map_file = "maps/test_line.txt"
+# map_file = "maps/test_line.txt"
 # map_file = "maps/test_cross.txt"
 # map_file = "maps/test_loop.txt"
-# map_file = "maps/test_loop_fork.txt"
+map_file = "maps/test_loop_fork.txt"
 # map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
@@ -28,7 +29,7 @@ player = Player(world.starting_room)
 # Fill this out with directions to walk
 # traversal_path = ['n', 'n']
 traversal_path = []
-#*******************************MY CODE*******************************
+#************************************** MY CODE **************************************
 
 
 
@@ -48,7 +49,7 @@ print(unvisited)
 
 # ****** END HELPER ******
 
-from graph import Graph
+# from graph import Graph
 # DFT
 from util import Stack
 
@@ -60,85 +61,206 @@ start_vert = player.current_room.id
 edges = unvisited[start_vert]
 
 
-g = Graph()
-################DFT################
+# g = Graph()
+# ************************** DFT **************************
 """
 Print each vertex in depth-first order
 beginning from starting_vertex.
 """
-# create a queue and enque starting_vertex
-ss = Stack()
-ss.push([start_vert])
+'''
+        2
+
+        1
+
+8   7   0   3   4
+
+        5
+
+        6
+    
+- start_vert is 0, 
+- add start_vert to stack
+- create visited tracker array.
+- while stack size greather than 0:
+    - pop last item from stack into path variable
+    - check if last item is in visited array.
+    - check if last item/path  has neighbors with '?'
+        - if it h
+
+- 0:{n:?, s:?, e:?, w:?}
+    if 0: direction = ?
+        travel n
+    else: 
+        travel back to 0
+
+'''
+
 
 # start python debugger.  pdb.set_trace() 
 # breakpoint()
 # pdb.set_trace()
 
-# create a set of traversed vertices
-visited = set()
-prev_room = player.current_room.id
-# while queue is not empty:
-while ss.size() > 0:
-    # dequeue/pop first vertex
-    path = ss.pop() # <-- important to POP before anything else in the loop when using a stack or you can end up in an infinite loop.
-    print("path: ", path)
+def find_path(graph, start_vert, end_vert, path=None):
+        """ find a path from start_vertex to end_vertex 
+            in graph """
+        print("#OIJFEL",graph)
+        print("#OIJFEL",type(graph))
+        print("#start",start_vert)
+        if path == None:
+            path = []
+        path = path + [start_vert]
+        if start_vert == end_vert:
+            return path
+        for k,vertex in graph.items():
+            for vert in vertex:
+                print("key: ", k)
+                print("vertex: ", vertex)
+                if vert not in path:
+                    extended_path = find_path(graph[k], end_vert, path)
+                    if extended_path: 
+                        return extended_path
+            return None
 
-    # if path not in visited:
-    if path[-1] not in visited:
-        # add to visited
-        visited.add(path[-1])
-        print(f"path: {path[-1]}")
+def dft_recursive(starting_vertex, visited=None, directions=None):
+    print("unvisited: ", unvisited)
 
-        # ***** Do the thing *****
-        dir = player.current_room.get_exits()
-        exits = [exit for exit in dir if unvisited[path[-1]][exit] == "?"]
-        print("exits", exits)
-        print("vert", unvisited[path[-1]][dir[-1]])
+    if visited is None:
+        visited = set()
 
-        if exits and unvisited[path[-1]][exits[-1]] == "?":
-            print(f"current room: {player.current_room.id}, dir is {exits[-1]}")
-            print("vert", unvisited[path[-1]][exits[-1]])
-            print("path: ", path)
-            print("path: ", path[-1])
-            player.travel(exits[-1])
-            traversal_path.append(exits[-1])
-            print("path again: ", path)            
-            print("path again: ", path[-1])
-            unvisited[path[-1]][exits[-1]] = player.current_room.id
-            print(f"updated vert: {path[-1]}, dir: {exits[-1]} to be {unvisited[path[-1]][exits[-1]]}")
+    if directions is None:
+        directions = []
 
-            unvisited[player.current_room.id][invert[exits[-1]]] = prev_room
-            prev_room = player.current_room.id
-            # print(f"current room: ", player.current_room.id)
-            # print(f"unvisited again: ", unvisited)
-            # enqueue all neighbors
-            for next_vert in unvisited[path[-1]]:
-                if unvisited[path[-1]][next_vert] != "?" and next_vert != invert[exits[-1]]:
-                    print("UNVISITED>>.: ", unvisited)
-                    print("next vert", next_vert)
-                    print("#EFWFE", unvisited[path[-1]][next_vert],"\n\n\n")
-                    new_path = list(path)
-                    new_path.append(unvisited[path[-1]][next_vert])
-                    ss.push(new_path)
+    dir = player.current_room.get_exits()
+    exits = [exit for exit in dir if unvisited[starting_vertex][exit] == "?"]
+    destination_vertex = 0
+    print(f"exits: {unvisited[8]}")
+
+    print(f"Starting VERT: {starting_vertex}")
+
+    # if starting_vertex not in visited:
+    #     visited.add(starting_vertex)
+    best_path = find_path(room_graph, 0, starting_vertex)
 
 
+    if len(exits) >= 1:
+        print(f"  ** exits: {exits}")
+        player.travel(exits[-1])
+        traversal_path.append(exits[-1])
+        directions.append(exits[-1])
+        print(f"  ** I moved {traversal_path[-1]} to ROOM: {player.current_room.id}")
+        unvisited[starting_vertex][exits[-1]] = player.current_room.id
+        unvisited[player.current_room.id][invert[traversal_path[-1]]] = starting_vertex
+        return dft_recursive(player.current_room.id, visited, directions)
+
+    # reverse course: 
+    elif len(exits) == 0 and starting_vertex is not destination_vertex:
+        print(best_path)
+        new_dirs = [invert[dir] for dir in directions]
+        print("NEWDIRS: ", new_dirs)
+        player.travel(new_dirs[-1])
+        traversal_path.append(new_dirs[-1])
+        new_dirs.pop()
+        return dft_recursive(player.current_room.id, visited, directions)
+
+    print(f"END OF THE ROAD!  Room: {starting_vertex} only has no unexplored exit: {unvisited[starting_vertex]}")
+    # BFS
+    print("START VERT: ", starting_vertex)
+    print("visited: ", visited)
+    # mypath = [vert for vert in visited]
+    # return mypath
+    print(f"UNVISITED: \n{unvisited}")
+dft_recursive(0)
 
 
 
-# ************ END DFT *************
+# ************************* END DFT **************************
 
-
-# BFS
+# **************************** BFS ****************************
 from util import Queue
 
+def bfs(starting_vertex, destination_vertex):
+        """
+        Return a list containing the shortest path from
+        starting_vertex to destination_vertex in
+        breath-first order.
+        """
+        
+        qq = Queue()
+        qq.enqueue([starting_vertex[-1]])  # this is enqueued as a list so we can add to the list.
+        visited = set(starting_vertex)
+
+        while qq.size() > 0:
+            # path is a list of the connected verts; initial pass it is just the starting vert. 
+            path = qq.dequeue()
+            print("Path: ", path)
+            print("Path: ", path[-1])
+            # Do the thing!
+            if path[-1] is destination_vertex:
+                print("DONE!!")
+                return path
+
+            if path[-1] not in visited:
+                visited.add(path[-1])
+                print("VISITED: ", visited)
+
+                for neighbor in unvisited[path[-1]]:
+                    print(neighbor)
+                    new_path = path.copy()
+                    new_path.append(unvisited[path[-1]][neighbor])
+                    qq.enqueue(new_path)
+
+# dft_recursive(0)
+# bfs(dft_recursive(0),0)
+print('path travelled: ', traversal_path)
+
+# def bfs(starting_vertex, destination_vertex):
+#         """
+#         Return a list containing the shortest path from
+#         starting_vertex to destination_vertex in
+#         breath-first order.
+#         """
+#         print("qq starting vert: ", starting_vertex[0])
+#         qq = Queue()
+#         qq.enqueue(starting_vertex)  # this is enqueued as a list so we can add to the list.
+#         bfs_visited = set()
+
+#         while qq.size() > 0:
+#             # path is a list of the connected verts; initial pass it is just the starting vert. 
+#             bfs_path = qq.dequeue()
+#             # while qt.size() > 0:
+#             # print("I went: ", bfs_path)
+#             print('\nFULL BFS_path', bfs_path)
+#             print('BFS path[-1]', bfs_path[-1])
+#             # Do the thing!
+#             if bfs_path[-1] is destination_vertex:
+#                 print(f"WE FINALLY GOT to the DESTINATION - {destination_vertex}")
+#                 print(f"bfs_path @ destination vert {destination_vertex}: {bfs_path}")
+#                 return bfs_path
+
+#             elif bfs_path[-1] not in bfs_visited:
+#                 bfs_visited.add(bfs_path[-1])
+#                 print(f"bfs_visited: {bfs_visited}")
+#                 # Do the thing.
+#                 # traversal_path.append()
+#                 # print(f"original path: {traversal_path}")
+    
+#                 for next_vert in unvisited[bfs_path[-1]]:
+#                     if unvisited[bfs_path[-1]] == "?":
+#                         print(f"FOUND ONE!", unvisited[bfs_path[-1]])
+#                     qq_new_path = path.copy()
+#                     qq_new_path.pop()
+#                     # qq_new_path.append(unvisited[bfs_path[-1]][next_vert])
+#                     print("next vert: ", next_vert)
+#                     print(f"hello mcfly: {unvisited[bfs_path[-1]][next_vert]}")
+#                     qq.enqueue(qq_new_path)
 
 
+# bfs(new_path[::-1], traversal_path[0])
 
 
+# ************************* END BFS **************************
 
-
-
-#*****************************END MY CODE*****************************
+# ************************************ END MY CODE ************************************
 
 
 

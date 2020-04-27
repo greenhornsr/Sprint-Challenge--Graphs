@@ -272,3 +272,44 @@ def dft_recursive(self, starting_vertex, visited=None):
 
 
 # maze_traveler(player.current_room.id)
+
+
+# # ****** helper func ********
+# def get_destination(curr_room = None, new_path_copy=None):
+#     new_path_copy = path.copy()
+#     print(f"{new_path_copy}")
+#     print("Remember to pop this from new_path_copy? Room", new_path_copy[-1])
+#     dest = new_path_copy[-1] 
+#     print(f"current room before traveling: {player.current_room.id}\n")
+#     end_exits = player.current_room.get_exits()
+#     print(f"room Exits: {end_exits}")
+#     if len(end_exits) == 1:
+#         player.travel(end_exits[-1])
+#         new_path_copy.pop()
+#         print(f"  ** only {len(end_exits)} exit!")
+#         print(f"  ** traveled to: {player.current_room.id}")
+#         traversal_path.append(end_exits[-1])
+#         print(f"  ** traveler path: {traversal_path}\n\n")
+#         curr_room = player.current_room.id
+#         get_destination(curr_room, new_path_copy)
+#     for exit in end_exits:
+#         print(f"room Exits: {end_exits}")
+#         print(f"VERT EXITS: {unvisited[curr_room][exit]}")
+#         print(f'current vert: {dest}, exit: {exit}')
+#         if unvisited[curr_room][exit] == '?':
+#             new_path_copy.pop()
+#             player.travel(exit)
+#             traversal_path.append(end_exits[-1])
+#             print(f"  ** traveler path: {traversal_path}\n\n")
+#             get_destination(curr_room, new_path_copy)
+
+#         new_path_copy.pop()
+#         player.travel(exit)
+#         get_destination(curr_room, new_path_copy)
+#         traversal_path.append(end_exits[-1])
+#         print(f"  ** traveler path: {traversal_path}\n\n")
+#     return dest
+
+#     # return dest
+# get_destination()
+# # ******* END HELPER ********
