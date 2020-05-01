@@ -6,6 +6,9 @@ import pdb
 import random
 from ast import literal_eval
 
+import sys
+sys.setrecursionlimit(10**6)
+
 # Load world
 world = World()
 
@@ -145,7 +148,7 @@ def dft_recursive(starting_vertex, visited=None, directions=None ):
                 return traversal_path
             return dft_recursive(player.current_room.id, visited, directions)
 
-        bfs(starting_vertex, len(room_graph)-1)
+        # bfs(starting_vertex, len(room_graph)-1)
 
         if len(exits_unknown) == 0:
             # print("  ** NO EXITS!!")
