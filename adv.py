@@ -200,8 +200,6 @@ def bfs(starting_vertex, destination_vertex):
 # Recursive DFT
 def dft_recursive(starting_vertex, visited=None, directions=None ):
     # print("unvisited: ", unvisited)
-    ss = []
-    ss.append(starting_vertex)
 
     if visited is None:
         visited = set()
@@ -210,50 +208,82 @@ def dft_recursive(starting_vertex, visited=None, directions=None ):
         directions = []
 
     invertd = [invert[dir] for dir in directions]
-    
-    # while len(ss) > 0: 
-    dir = player.current_room.get_exits()
-    exits_unknown = [exit for exit in dir if unvisited[starting_vertex][exit] == "?"]
-    exits_known = player.current_room.get_exits()
-    destination_vertex = 0
-    # print(f"exits: {unvisited[4]}")
 
-    # random direction
+    # print(f"212 - Starting VERT: {starting_vertex}")
+    if len(visited) < len(room_graph):
+        #Directions
+        dir = unvisited[starting_vertex]
+        exits_unknown = [exit for exit in dir if unvisited[starting_vertex][exit] == "?"]
+        # exits_known = player.current_room.get_exits()
+        destination_vertex = 499
+        # print(f"  ** 219 - exits: {exits_unknown}")
+        if starting_vertex not in visited:
+            visited.add(starting_vertex)
 
-    print(f"Starting VERT: {starting_vertex}")
-
-    if starting_vertex not in visited:
-        visited.add(starting_vertex)
-
-    if len(exits_unknown) >= 1:
-        # choose random exit
-        import random
-        rand_index = random.randint(0,len(exits_unknown)-1)
-        # print("random index: ", rand_index)
-        # print(f"  ** exits: {exits_unknown}")
-        player.travel(exits_unknown[rand_index])
-        traversal_path.append(exits_unknown[rand_index])
-        directions.append(exits_unknown[rand_index])
-        # print(f"  ** I moved {traversal_path[-1]} to ROOM: {player.current_room.id}")
-        unvisited[starting_vertex][exits_unknown[rand_index]] = player.current_room.id
-        unvisited[player.current_room.id][invert[traversal_path[-1]]] = starting_vertex
-        return dft_recursive(player.current_room.id, visited, directions)
-
-    bfs(starting_vertex, 499)
-
-
-    
-    # elif len(visited) < 500:
-    if len(exits_unknown) == 0 and starting_vertex is not destination_vertex:
-        # print("NEWDIRS: ", invertd)
-        if invertd:
-            go_to = invertd[-1]
-            directions.pop()
-            # print(f"GOING: {go_to}")
-            player.travel(go_to)
-            # print("NEWDIRS after POP: ", invertd)
-            traversal_path.append(go_to)
+        if len(exits_unknown) >= 1:
+            while starting_vertex is not destination_vertex:
+                # choose random exit
+                import random
+                rand_index = random.randint(0,len(exits_unknown)-1)
+                # print("random index: ", rand_index)
+                # print(f"  ** exits: {exits_unknown}")
+                player.travel(exits_unknown[rand_index])
+                traversal_path.append(exits_unknown[rand_index])
+                directions.append(exits_unknown[rand_index])
+                # print(f"  ** I moved {traversal_path[-1]} to ROOM: {player.current_room.id}")
+                unvisited[starting_vertex][exits_unknown[rand_index]] = player.current_room.id
+                unvisited[player.current_room.id][invert[traversal_path[-1]]] = starting_vertex
+                return dft_recursive(player.current_room.id, visited, directions)
+            if starting_vertex is destination_vertex:
+                # print(f"NO WHERE TO GO! \n{visited}\n")
+                verts_remaining = [v for v in unvisited if v not in visited]
+                # print(f"unvisited verts: \n{verts_remaining}")
+                if verts_remaining:
+                    destination_vertex = verts_remaining[-1]
+                    # return dft_recursive(player.current_room.id, visited, directions)
+                return
+            if len(visited) == len(room_graph):
+                # print("ALL DONE!!!")
+                return traversal_path
             return dft_recursive(player.current_room.id, visited, directions)
+
+        bfs(starting_vertex, 499)
+
+        # elif len(visited) < 500:
+        if len(exits_unknown) == 0:
+            # print("  ** NO EXITS!!")
+            # print(f"    *** continuing on vert: {starting_vertex}")
+            while starting_vertex is not destination_vertex:
+                # print("NEWDIRS: ", invertd)
+                if invertd:
+                    go_to = invertd[-1]
+                    directions.pop()
+                    # print(f"GOING: {go_to}")
+                    player.travel(go_to)
+                    # print("NEWDIRS after POP: ", invertd)
+                    traversal_path.append(go_to)
+                    return dft_recursive(player.current_room.id, visited, directions)
+            # player.current_room.get_exits()
+            if starting_vertex is destination_vertex:
+                # print(f"NO WHERE TO GO! \n{visited}\n")
+                verts_remaining = [v for v in unvisited if v not in visited]
+                # print(f"unvisited verts: \n{verts_remaining}")
+                if verts_remaining:
+                    destination_vertex = verts_remaining[-1]
+                    # return dft_recursive(player.current_room.id, visited, directions)
+                return
+            if len(visited) == len(room_graph):
+                # print("ALL DONE!!!")
+                return traversal_path
+            return dft_recursive(player.current_room.id, visited, directions)
+
+    # print("visited: ", visited)
+    # print(f"END OF THE ROAD!  Room: {starting_vertex} only has no unexplored exit: {unvisited[starting_vertex]}")
+    # print("START VERT: ", starting_vertex)
+    # mypath = [vert for vert in visited]
+    # print(f"UNVISITED: \n{unvisited}")
+    # print(f"MORE TO DO?  {directions}")
+    return traversal_path
 
     # # TEST! 
     # if len(exits_known) > 1:
@@ -269,17 +299,10 @@ def dft_recursive(starting_vertex, visited=None, directions=None ):
     #         unvisited[player.current_room.id][invert[traversal_path[-1]]] = starting_vertex
     #         return dft_recursive(player.current_room.id, visited, directions)   
 
-    print(f"END OF THE ROAD!  Room: {starting_vertex} only has no unexplored exit: {unvisited[starting_vertex]}")
-    print("START VERT: ", starting_vertex)
-    print("visited: ", visited)
-    # mypath = [vert for vert in visited]
-    # print(f"UNVISITED: \n{unvisited}")
-    print(f"MORE TO DO?  {directions}")
-    return traversal_path
-
 
 unvisited = create_unvisited(room_graph)
 dft_recursive(0)
+world.print_rooms()
 # ************************* END DFT **************************
 
 

@@ -13,9 +13,9 @@ world = World()
 # You may uncomment the smaller graphs for development and testing purposes.
 # map_file = "maps/test_line.txt"
 # map_file = "maps/test_cross.txt"
-# map_file = "maps/test_loop.txt"
+map_file = "maps/test_loop.txt"
 # map_file = "maps/test_loop_fork.txt"
-map_file = "maps/main_maze.txt"
+# map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
 room_graph=literal_eval(open(map_file, "r").read())
@@ -125,7 +125,7 @@ def dft_recursive(starting_vertex, visited=None, lap_path=None):
 
     #Starting Vert Check:
     print(f"\n\nStarting ROOM: {starting_vertex}")
-    print(f"PLAYER CURRENT ROOM: {player.current_room.id}")
+    # print(f"PLAYER CURRENT ROOM: {player.current_room.id}")  #   **********************
 
     # Tracking Visited Verts
     if starting_vertex not in visited:
@@ -134,7 +134,7 @@ def dft_recursive(starting_vertex, visited=None, lap_path=None):
         # GET/MANAGE EXITS
         # dir = player.current_room.get_exits()
         # exits = [e for e in dir if unvisited[starting_vertex][e] is "?"]
-        exits = player.current_room.get_exits()
+        exits = unvisited[starting_vertex]
         # exits = unvisited[starting_vertex]
         print(f"  ** ROOM: {player.current_room.id} Player EXITS: {exits}")
         # print(f"  ** TESTEXITS: {testexits}")
@@ -142,20 +142,31 @@ def dft_recursive(starting_vertex, visited=None, lap_path=None):
         # Loop through neighboring verts, check if visited, recurse.
         for next_vert in exits:
             # print("exits: ", player.current_room.get_exits())
-            print("  ** next vert: ", next_vert)
+            # print("  ** next vert: ", next_vert)
 
             # this is the break/base case
             if next_vert in unvisited[starting_vertex]: 
                 if room_graph[starting_vertex][1][next_vert] not in visited:
-                    print(f"  ** From {starting_vertex}, checking {next_vert} and found: {room_graph[starting_vertex][1][next_vert]}.")
+                    # print(f"  ** From {starting_vertex}, checking {next_vert} and found: {room_graph[starting_vertex][1][next_vert]}.")
                     # if unvisited[starting_vertex][next_vert] not in visited:
                     print("  ** next room: ", room_graph[starting_vertex][1][next_vert])
                     lap_path.append(next_vert)
-                    print("path is: ", lap_path)
+                    traversal_path.append(next_vert)
+                    print("lap path is: ", lap_path)
+                    # print("traversal path is: ", traversal_path)
                     dft_recursive(room_graph[starting_vertex][1][next_vert], visited, lap_path)
             print(f"  ** FINISHED LOOP!")
-        print(f"Exiting starting vert in visited!")
+            if len(exits) == 1:
+                # print("1 - traversal path is: ", traversal_path)
+                print(f"Exiting starting vert in visited!")
+                new_path = [invert[d] for d in lap_path]
+                # print("NEWPATH: ", new_path)
+                final_path = traversal_path + new_path
+                print("2 - Final path: ", final_path)
+
     print(f"FINISHED RECURSIVE LAP! \n")
+    # print(f"visited: {visited}")
+    # return traversal_path
 
 # # TRAVEL?
 # prev_vert = starting_vertex
