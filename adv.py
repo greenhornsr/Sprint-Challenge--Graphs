@@ -121,7 +121,7 @@ def dft_recursive(starting_vertex, visited=None, directions=None ):
         #Directions/exits
         dir = unvisited[starting_vertex]
         exits_unknown = [exit for exit in dir if unvisited[starting_vertex][exit] == "?"]
-        destination_vertex = 499
+        destination_vertex = len(room_graph)-1
         if starting_vertex not in visited:
             visited.add(starting_vertex)
 
